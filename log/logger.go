@@ -39,8 +39,9 @@ func Init() {
 	Info("Logger Zap inited!")
 }
 
-func Err(err error, msg string, fields ...zap.Field) {
+func Err(err error, msg string, fields ...zap.Field) error {
 	logger.Error(fmt.Sprintf("%v: %v", msg, err), fields...)
+	return err
 }
 
 func Warn(msg string, fields ...zap.Field) {
