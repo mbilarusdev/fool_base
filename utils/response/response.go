@@ -1,18 +1,14 @@
-package write_utils
+package response_utils
 
 import (
 	"encoding/json"
 	"net/http"
+
+	response_models "github.com/mbilarusdev/fool_base/v2/utils/response/models"
 )
 
-type Response struct {
-	Code  int    `json:"code"`
-	Data  any    `json:"data,omitempty"`
-	Error string `json:"error,omitempty"`
-}
-
 func WriteResponse(w http.ResponseWriter, code int, data any) {
-	response := Response{
+	response := response_models.Response{
 		Code: code,
 		Data: data,
 	}
@@ -23,7 +19,7 @@ func WriteResponse(w http.ResponseWriter, code int, data any) {
 }
 
 func WriteError(w http.ResponseWriter, code int, errMsg string) {
-	WriteResponse(w, code, Response{
+	WriteResponse(w, code, response_models.Response{
 		Error: errMsg,
 	})
 }

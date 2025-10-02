@@ -5,39 +5,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/mbilarusdev/fool_base/v2/log"
+	gateway_models "github.com/mbilarusdev/fool_base/v2/utils/gateway/models"
 	"go.uber.org/zap"
 )
 
-type RegisterForm struct {
-	ServiceName       string `json:"service_name"`
-	GatewayAddr       string
-	GatewayProtocol   string
-	ServiceRemoteAddr string `json:"service_remote_addr"`
-	ServiceProtocol   string `json:"service_protocol"`
-}
+func RegisterInGateway(form gateway_models.RegisterForm) {
+	err := tryPostToGateway(form)
 
-func RegisterInGateway(form RegisterForm) {
-	retryTimeout := time.Second * 10
-	for {
-		err := tryPostToGateway(form)
-		if err != nil {
-			log.Err(
-				err,
-				"Failed to register in gateway: ",
-				zap.String(form.ServiceName, joinUrl(form.ServiceProtocol, form.ServiceRemoteAddr)),
-				zap.String("Gateway", joinUrl(form.GatewayProtocol, form.GatewayAddr)),
-			)
-			time.Sleep(retryTimeout)
-			continue
-		}
-		break
+	if err != nil {
+		log.Err(
+			err,
+			"Failed to register in gateway: ",
+			zap.String(form.ServiceName, joinUrl(form.ServiceProtocol, form.ServiceRemoteAddr)),
+			zap.String("Gateway", joinUrl(form.GatewayProtocol, form.GatewayAddr)),
+		)
+		return
 	}
+
+	log.Info("Gateway connected with success")
 }
 
-func tryPostToGateway(form RegisterForm) error {
+func tryPostToGateway(form gateway_models.RegisterForm) error {
 	jsonForm, err := json.Marshal(form)
 	if err != nil {
 		return err

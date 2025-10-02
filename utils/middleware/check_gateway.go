@@ -6,20 +6,16 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	middleware_models "github.com/mbilarusdev/fool_base/v2/utils/middleware/models"
 )
 
-type GatewayAddr struct {
-	Host        string
-	Port        int
-	IsLocalHost bool
-}
-
-func GetGatewayAddr() *GatewayAddr {
+func GetGatewayAddr() *middleware_models.GatewayAddr {
 	addr := os.Getenv("GATEWAY_ADDR")
 	if addr == "" {
 		panic("Env var GATEWAY_ADDR not founded")
 	}
-	gatewayAddr := new(GatewayAddr)
+	gatewayAddr := new(middleware_models.GatewayAddr)
 
 	splittedAddr := strings.Split(addr, ":")
 	if len(splittedAddr) != 2 {
@@ -40,7 +36,9 @@ func GetGatewayAddr() *GatewayAddr {
 	return gatewayAddr
 }
 
-func GetCheckGatewayMiddleware(gatewayAddr *GatewayAddr) func(next http.Handler) http.Handler {
+func GetCheckGatewayMiddleware(
+	gatewayAddr *middleware_models.GatewayAddr,
+) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
