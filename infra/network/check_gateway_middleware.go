@@ -8,23 +8,39 @@ import (
 	"strings"
 )
 
-func CheckGatewayMiddleware(next http.Handler) http.Handler {
+type GatewayAddr struct {
+	Host        string
+	Port        int
+	IsLocalHost bool
+}
+
+func GetGatewayAddr() *GatewayAddr {
 	addr := os.Getenv("GATEWAY_ADDR")
 	if addr == "" {
 		panic("Env var GATEWAY_ADDR not founded")
 	}
+	gatewayAddr := new(GatewayAddr)
+
 	splittedAddr := strings.Split(addr, ":")
 	if len(splittedAddr) != 2 {
 		panic("Failed to parse GATEWAY_ADDR")
 	}
-	var isLocalHost bool
+
 	gatewayPort, err := strconv.Atoi(splittedAddr[1])
 	if err != nil {
 		panic("Failed to parse GATEWAY_ADDR port")
 	}
 	gatewayHost := splittedAddr[0]
-	isLocalHost = checkLocalHost(gatewayHost)
+	isLocalHost := checkLocalHost(gatewayHost)
 
+	gatewayAddr.Port = gatewayPort
+	gatewayAddr.Host = gatewayHost
+	gatewayAddr.IsLocalHost = isLocalHost
+
+	return gatewayAddr
+}
+
+func CheckGatewayMiddleware(next http.Handler, gatewayAddr *GatewayAddr) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		remoteAddr := r.RemoteAddr
@@ -40,17 +56,17 @@ func CheckGatewayMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if isLocalHost && checkLocalHost(remoteHost) {
+		if gatewayAddr.IsLocalHost && checkLocalHost(remoteHost) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		if !isLocalHost && remoteHost != gatewayHost {
+		if !gatewayAddr.IsLocalHost && remoteHost != gatewayAddr.Host {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		if remotePort != gatewayPort {
+		if remotePort != gatewayAddr.Port {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
