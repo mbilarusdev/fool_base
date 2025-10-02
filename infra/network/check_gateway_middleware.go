@@ -40,39 +40,41 @@ func GetGatewayAddr() *GatewayAddr {
 	return gatewayAddr
 }
 
-func CheckGatewayMiddleware(next http.Handler, gatewayAddr *GatewayAddr) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func GetCheckGatewayMiddleware(gatewayAddr *GatewayAddr) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		remoteAddr := r.RemoteAddr
-		remoteHost, portStr, err := net.SplitHostPort(remoteAddr)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+			remoteAddr := r.RemoteAddr
+			remoteHost, portStr, err := net.SplitHostPort(remoteAddr)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 
-		remotePort, err := strconv.Atoi(portStr)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+			remotePort, err := strconv.Atoi(portStr)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 
-		if gatewayAddr.IsLocalHost && checkLocalHost(remoteHost) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+			if gatewayAddr.IsLocalHost && checkLocalHost(remoteHost) {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
 
-		if !gatewayAddr.IsLocalHost && remoteHost != gatewayAddr.Host {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+			if !gatewayAddr.IsLocalHost && remoteHost != gatewayAddr.Host {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
 
-		if remotePort != gatewayAddr.Port {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+			if remotePort != gatewayAddr.Port {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
 
-		next.ServeHTTP(w, r)
-	})
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 func checkLocalHost(host string) bool {
