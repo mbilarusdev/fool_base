@@ -1,4 +1,4 @@
-package network
+package write_utils
 
 import (
 	"encoding/json"

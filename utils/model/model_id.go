@@ -1,4 +1,4 @@
-package modelid
+package model_utils
 
 import (
 	"database/sql/driver"

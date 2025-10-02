@@ -1,4 +1,4 @@
-package network
+package middleware_utils
 
 import (
 	"net"
