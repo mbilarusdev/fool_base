@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/mbilarusdev/fool_base/log"
+	"github.com/mbilarusdev/fool_base/v2/log"
 )
 
 type DBPool struct {

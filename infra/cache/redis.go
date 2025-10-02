@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/mbilarusdev/fool_base/log"
+	"github.com/mbilarusdev/fool_base/v2/log"
 )
 
 func PingRDB() *redis.Client {

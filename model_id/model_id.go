@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/mbilarusdev/fool_base/log"
+	"github.com/mbilarusdev/fool_base/v2/log"
 )
 
 type ModelId struct {

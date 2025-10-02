@@ -1,4 +1,4 @@
-module github.com/mbilarusdev/fool_base
+module github.com/mbilarusdev/fool_base/v2
 
 go 1.25.1
 

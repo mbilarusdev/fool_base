@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/mbilarusdev/fool_base/log"
+	"github.com/mbilarusdev/fool_base/v2/log"
 	"go.uber.org/zap"
 )
 
